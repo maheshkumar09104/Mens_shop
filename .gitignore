@@ -10,10 +10,8 @@ server/dist/
 
 # Environment files
 .env
-client/.env
-server/.env
-.env.local
-.env.*.local
+node_modules/
+dist/
 
 # Logs
 npm-debug.log*
