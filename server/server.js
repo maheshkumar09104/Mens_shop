@@ -65,3 +65,11 @@ app.use(cors({
   ],
   credentials: true
 }));
+
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://mens-shop.vercel.app'
+  ],
+  credentials: true
+}));
