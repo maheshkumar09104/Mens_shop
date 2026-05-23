@@ -57,3 +57,11 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://mens-shop.vercel.app'  // update after Vercel deploy
+  ],
+  credentials: true
+}));
