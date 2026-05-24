@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 const connectDB = require("./config/db");
+const seedAdmin = require("./config/seedAdmin");
 const authRoutes = require("./routes/authRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
@@ -57,6 +58,7 @@ app.use(errorHandler);
 
 const startServer = async () => {
   await connectDB();
+  await seedAdmin();
 
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

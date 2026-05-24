@@ -19,3 +19,9 @@ services:
         value: https://mens-shop.vercel.app
       - key: CLIENT_URLS
         value: http://localhost:5173,https://mens-shop.vercel.app,https://mens-shop-bcnyemnew-maheshkumar09104s-projects.vercel.app
+      - key: ADMIN_NAME
+        value: Admin
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
