@@ -1,12 +1,11 @@
 const User = require("../models/User");
 
 const seedAdmin = async () => {
-  const { ADMIN_NAME = "Admin", ADMIN_EMAIL, ADMIN_PASSWORD } = process.env;
-
-  if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
-    console.log("Admin seed skipped: ADMIN_EMAIL or ADMIN_PASSWORD not set");
-    return;
-  }
+  const {
+    ADMIN_NAME = "Admin",
+    ADMIN_EMAIL = "admin123@gmail.com",
+    ADMIN_PASSWORD = "admin123"
+  } = process.env;
 
   const existingAdmin = await User.findOne({ email: ADMIN_EMAIL });
 

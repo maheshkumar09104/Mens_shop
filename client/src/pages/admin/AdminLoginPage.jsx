@@ -1,17 +1,21 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import api from "../services/api";
-import useAuthStore from "../store/authStore";
+import api from "../../services/api";
+import useAuthStore from "../../store/authStore";
 
-function LoginPage() {
+function AdminLoginPage() {
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
+  const { isAdmin, login } = useAuthStore();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
   const [loading, setLoading] = useState(false);
+
+  if (isAdmin) {
+    return <Navigate to="/admin" replace />;
+  }
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -26,17 +30,16 @@ function LoginPage() {
       const { data } = await api.post("/auth/login", formData);
       const { token, ...user } = data;
 
-      if (user.role === "admin") {
-        toast.error("Please use the Admin Login page.");
-        navigate("/admin/login");
+      if (user.role !== "admin") {
+        toast.error("This account is not an admin account.");
         return;
       }
 
       login(user, token);
-      toast.success("Welcome back to Mens Shop");
-      navigate("/");
+      toast.success("Admin login successful");
+      navigate("/admin");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Login failed. Please try again.");
+      toast.error(error.response?.data?.message || "Admin login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -46,41 +49,43 @@ function LoginPage() {
     <section className="flex min-h-[calc(100vh-160px)] items-center justify-center py-10">
       <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 shadow-lg">
         <div className="text-center">
-          <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Account Access</p>
-          <h1 className="mt-2 text-3xl font-black text-[#1a2e4a]">Login</h1>
-          <p className="mt-3 text-sm text-slate-600">Sign in to manage your cart, wishlist, and orders.</p>
+          <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Admin Access</p>
+          <h1 className="mt-2 text-3xl font-black text-[#1a2e4a]">Admin Login</h1>
+          <p className="mt-3 text-sm text-slate-600">
+            Sign in with an admin account to manage products and orders.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
           <div>
-            <label htmlFor="email" className="text-sm font-bold text-[#1a2e4a]">
-              Email
+            <label htmlFor="admin-email" className="text-sm font-bold text-[#1a2e4a]">
+              Admin Email
             </label>
             <input
-              id="email"
+              id="admin-email"
               name="email"
               type="email"
               value={formData.email}
               onChange={handleChange}
               required
               className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-[#c9a84c] focus:ring-2 focus:ring-[#c9a84c]/30"
-              placeholder="you@example.com"
+              placeholder="admin123@gmail.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="text-sm font-bold text-[#1a2e4a]">
+            <label htmlFor="admin-password" className="text-sm font-bold text-[#1a2e4a]">
               Password
             </label>
             <input
-              id="password"
+              id="admin-password"
               name="password"
               type="password"
               value={formData.password}
               onChange={handleChange}
               required
               className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-[#c9a84c] focus:ring-2 focus:ring-[#c9a84c]/30"
-              placeholder="Enter your password"
+              placeholder="Enter admin password"
             />
           </div>
 
@@ -89,20 +94,14 @@ function LoginPage() {
             disabled={loading}
             className="w-full rounded-md bg-[#1a2e4a] px-5 py-3 font-bold text-white transition hover:bg-[#233d62] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? "Signing in..." : "Login"}
+            {loading ? "Signing in..." : "Admin Login"}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-600">
-          New to Mens Shop?{" "}
-          <Link to="/register" className="font-bold text-[#1a2e4a] underline decoration-[#c9a84c] underline-offset-4">
-            Create an account
-          </Link>
-        </p>
-        <p className="mt-3 text-center text-sm text-slate-600">
-          Admin?{" "}
-          <Link to="/admin/login" className="font-bold text-[#1a2e4a] underline decoration-[#c9a84c] underline-offset-4">
-            Go to Admin Login
+          Customer account?{" "}
+          <Link to="/login" className="font-bold text-[#1a2e4a] underline decoration-[#c9a84c] underline-offset-4">
+            Go to User Login
           </Link>
         </p>
       </div>
@@ -110,4 +109,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default AdminLoginPage;
