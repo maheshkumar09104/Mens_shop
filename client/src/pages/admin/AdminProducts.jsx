@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
-import { FaEdit, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
+import { FaEdit, FaImage, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
 import api from "../../services/api";
+import useAuthStore from "../../store/authStore";
 import AdminLayout from "./AdminLayout";
 
 const emptyForm = {
@@ -9,13 +10,15 @@ const emptyForm = {
   description: "",
   price: "",
   category: "T-Shirts",
-  image: "",
-  stock: 0
+  stock: 0,
+  imageFile: null,
+  imagePreview: ""
 };
 
 const categories = ["T-Shirts", "Shirts", "Pants", "Shoes", "Accessories"];
 
 function AdminProducts() {
+  const token = useAuthStore((state) => state.token);
   const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState(emptyForm);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -23,9 +26,33 @@ function AdminProducts() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const authHeaders = useMemo(
+    () => ({
+      Authorization: token ? `Bearer ${token}` : undefined
+    }),
+    [token]
+  );
+
+  const getImageUrl = (image) => {
+    if (!image) {
+      return "";
+    }
+
+    if (image.startsWith("http")) {
+      return image;
+    }
+
+    const apiOrigin = (import.meta.env.VITE_API_URL || "https://mens-shop-1.onrender.com").replace(/\/$/, "");
+    return `${apiOrigin}${image.startsWith("/") ? image : `/${image}`}`;
+  };
+
   const fetchProducts = async () => {
+    setLoading(true);
+
     try {
-      const { data } = await api.get("/products");
+      const { data } = await api.get("/products", {
+        headers: authHeaders
+      });
       setProducts(data);
     } catch (error) {
       toast.error(error.response?.data?.message || "Unable to load products");
@@ -36,7 +63,7 @@ function AdminProducts() {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [token]);
 
   const openAddModal = () => {
     setEditingProduct(null);
@@ -51,8 +78,9 @@ function AdminProducts() {
       description: product.description || "",
       price: product.price || "",
       category: product.category || "T-Shirts",
-      image: product.image || "",
-      stock: product.stock || 0
+      stock: product.stock || 0,
+      imageFile: null,
+      imagePreview: getImageUrl(product.image)
     });
     setIsModalOpen(true);
   };
@@ -68,25 +96,56 @@ function AdminProducts() {
     setFormData((current) => ({ ...current, [name]: value }));
   };
 
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setFormData((current) => ({
+      ...current,
+      imageFile: file,
+      imagePreview: URL.createObjectURL(file)
+    }));
+  };
+
+  const buildProductFormData = () => {
+    const productFormData = new FormData();
+
+    productFormData.append("name", formData.name);
+    productFormData.append("description", formData.description);
+    productFormData.append("price", formData.price);
+    productFormData.append("category", formData.category);
+    productFormData.append("stock", formData.stock);
+
+    if (formData.imageFile) {
+      productFormData.append("image", formData.imageFile);
+    }
+
+    return productFormData;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setSaving(true);
 
-    const payload = {
-      ...formData,
-      price: Number(formData.price),
-      stock: Number(formData.stock)
-    };
-
     try {
+      const requestConfig = {
+        headers: {
+          ...authHeaders,
+          "Content-Type": "multipart/form-data"
+        }
+      };
+
       if (editingProduct) {
-        const { data } = await api.put(`/products/${editingProduct._id}`, payload);
+        const { data } = await api.put(`/products/${editingProduct._id}`, buildProductFormData(), requestConfig);
         setProducts((current) => current.map((product) => (product._id === data._id ? data : product)));
-        toast.success("Product updated");
+        toast.success("Product updated successfully");
       } else {
-        const { data } = await api.post("/products", payload);
+        const { data } = await api.post("/products", buildProductFormData(), requestConfig);
         setProducts((current) => [data, ...current]);
-        toast.success("Product added");
+        toast.success("Product added successfully");
       }
 
       closeModal();
@@ -105,9 +164,11 @@ function AdminProducts() {
     }
 
     try {
-      await api.delete(`/products/${id}`);
+      await api.delete(`/products/${id}`, {
+        headers: authHeaders
+      });
       setProducts((current) => current.filter((product) => product._id !== id));
-      toast.success("Product deleted");
+      toast.success("Product deleted successfully");
     } catch (error) {
       toast.error(error.response?.data?.message || "Unable to delete product");
     }
@@ -131,12 +192,13 @@ function AdminProducts() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-sm">
+          <table className="w-full min-w-[860px] text-left text-sm">
             <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600">
               <tr>
+                <th className="px-5 py-4">Image</th>
                 <th className="px-5 py-4">Name</th>
-                <th className="px-5 py-4">Price</th>
                 <th className="px-5 py-4">Category</th>
+                <th className="px-5 py-4">Price</th>
                 <th className="px-5 py-4">Stock</th>
                 <th className="px-5 py-4 text-right">Actions</th>
               </tr>
@@ -144,9 +206,22 @@ function AdminProducts() {
             <tbody className="divide-y divide-slate-200">
               {products.map((product) => (
                 <tr key={product._id}>
+                  <td className="px-5 py-4">
+                    {product.image ? (
+                      <img
+                        src={getImageUrl(product.image)}
+                        alt={product.name}
+                        className="h-16 w-16 rounded-md object-cover"
+                      />
+                    ) : (
+                      <div className="grid h-16 w-16 place-items-center rounded-md bg-slate-100 text-slate-400">
+                        <FaImage />
+                      </div>
+                    )}
+                  </td>
                   <td className="px-5 py-4 font-bold text-[#1a2e4a]">{product.name}</td>
-                  <td className="px-5 py-4">${Number(product.price || 0).toFixed(2)}</td>
                   <td className="px-5 py-4">{product.category}</td>
+                  <td className="px-5 py-4">${Number(product.price || 0).toFixed(2)}</td>
                   <td className="px-5 py-4">{product.stock}</td>
                   <td className="px-5 py-4">
                     <div className="flex justify-end gap-2">
@@ -168,6 +243,14 @@ function AdminProducts() {
                   </td>
                 </tr>
               ))}
+
+              {!loading && products.length === 0 && (
+                <tr>
+                  <td colSpan="6" className="px-5 py-10 text-center text-slate-600">
+                    No products found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -175,7 +258,7 @@ function AdminProducts() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/60 p-4">
-          <div className="w-full max-w-2xl rounded-lg bg-white shadow-xl">
+          <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-slate-200 p-5">
               <h2 className="text-xl font-black text-[#1a2e4a]">
                 {editingProduct ? "Edit Product" : "Add Product"}
@@ -188,7 +271,7 @@ function AdminProducts() {
             <form onSubmit={handleSubmit} className="grid gap-4 p-5 md:grid-cols-2">
               <div className="md:col-span-2">
                 <label className="text-sm font-bold text-[#1a2e4a]" htmlFor="name">
-                  Name
+                  Product Name
                 </label>
                 <input
                   id="name"
@@ -196,6 +279,20 @@ function AdminProducts() {
                   value={formData.name}
                   onChange={handleChange}
                   required
+                  className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-[#c9a84c] focus:ring-2 focus:ring-[#c9a84c]/30"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="text-sm font-bold text-[#1a2e4a]" htmlFor="description">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows="4"
                   className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-[#c9a84c] focus:ring-2 focus:ring-[#c9a84c]/30"
                 />
               </div>
@@ -213,21 +310,6 @@ function AdminProducts() {
                   value={formData.price}
                   onChange={handleChange}
                   required
-                  className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-[#c9a84c] focus:ring-2 focus:ring-[#c9a84c]/30"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-bold text-[#1a2e4a]" htmlFor="stock">
-                  Stock
-                </label>
-                <input
-                  id="stock"
-                  name="stock"
-                  type="number"
-                  min="0"
-                  value={formData.stock}
-                  onChange={handleChange}
                   className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-[#c9a84c] focus:ring-2 focus:ring-[#c9a84c]/30"
                 />
               </div>
@@ -252,30 +334,50 @@ function AdminProducts() {
               </div>
 
               <div>
-                <label className="text-sm font-bold text-[#1a2e4a]" htmlFor="image">
-                  Image URL
+                <label className="text-sm font-bold text-[#1a2e4a]" htmlFor="stock">
+                  Stock Quantity
                 </label>
                 <input
-                  id="image"
-                  name="image"
-                  value={formData.image}
+                  id="stock"
+                  name="stock"
+                  type="number"
+                  min="0"
+                  value={formData.stock}
                   onChange={handleChange}
                   className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-[#c9a84c] focus:ring-2 focus:ring-[#c9a84c]/30"
                 />
               </div>
 
-              <div className="md:col-span-2">
-                <label className="text-sm font-bold text-[#1a2e4a]" htmlFor="description">
-                  Description
+              <div>
+                <label className="text-sm font-bold text-[#1a2e4a]" htmlFor="image">
+                  Image Upload
                 </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows="4"
-                  className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-[#c9a84c] focus:ring-2 focus:ring-[#c9a84c]/30"
+                <input
+                  id="image"
+                  name="image"
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg,image/webp"
+                  onChange={handleImageChange}
+                  className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[#1a2e4a] file:px-3 file:py-2 file:font-bold file:text-white"
                 />
+              </div>
+
+              <div className="md:col-span-2">
+                <p className="text-sm font-bold text-[#1a2e4a]">Image Preview</p>
+                <div className="mt-2 grid min-h-48 place-items-center rounded-lg border border-dashed border-slate-300 bg-slate-50">
+                  {formData.imagePreview ? (
+                    <img
+                      src={formData.imagePreview}
+                      alt="Product preview"
+                      className="max-h-72 w-full rounded-lg object-contain p-3"
+                    />
+                  ) : (
+                    <div className="text-center text-slate-500">
+                      <FaImage className="mx-auto mb-2" size={28} />
+                      Select an image to preview it before upload.
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 md:col-span-2">
@@ -289,7 +391,7 @@ function AdminProducts() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="rounded-md bg-[#c9a84c] px-5 py-3 font-black text-[#1a2e4a] transition hover:bg-[#d6b85f] disabled:opacity-70"
+                  className="rounded-md bg-[#c9a84c] px-5 py-3 font-black text-[#1a2e4a] transition hover:bg-[#d6b85f] disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {saving ? "Saving..." : "Save Product"}
                 </button>

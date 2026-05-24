@@ -7,7 +7,7 @@ const router = express.Router();
 router.post("/", protect, adminOnly, upload.single("image"), (req, res) => {
   res.status(201).json({
     message: "Image uploaded",
-    image: `/${req.file.path.replace(/\\/g, "/")}`
+    image: `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
   });
 });
 

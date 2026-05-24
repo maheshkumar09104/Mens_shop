@@ -1,9 +1,10 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://mens-shop-1.onrender.com";
 
 const api = axios.create({
-  baseURL: API_BASE_URL ? `${API_BASE_URL}/api` : "/api",
+  baseURL: `${API_BASE_URL.replace(/\/$/, "")}/api`,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json"
   }

@@ -16,9 +16,11 @@ connectDB();
 const app = express();
 const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
+  "http://localhost:5173",
+  "https://mens-shop.vercel.app",
+  "https://mens-shop-bcnyemnew-maheshkumar09104s-projects.vercel.app",
   process.env.CLIENT_URL,
-  ...(process.env.CLIENT_URLS ? process.env.CLIENT_URLS.split(",") : []),
-  "http://localhost:5173"
+  ...(process.env.CLIENT_URLS ? process.env.CLIENT_URLS.split(",").map((origin) => origin.trim()) : [])
 ].filter(Boolean);
 
 app.use(
@@ -57,19 +59,3 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://mens-shop.vercel.app'  // update after Vercel deploy
-  ],
-  credentials: true
-}));
-
-app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://mens-shop.vercel.app'
-  ],
-  credentials: true
-}));
