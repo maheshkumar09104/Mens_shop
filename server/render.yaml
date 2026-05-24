@@ -16,6 +16,6 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CLIENT_URL
-        value: https://your-vercel-frontend.vercel.app
+        value: https://mens-shop.vercel.app
       - key: CLIENT_URLS
-        value: https://your-vercel-frontend.vercel.app,http://localhost:5173
+        value: http://localhost:5173,https://mens-shop.vercel.app,https://mens-shop-bcnyemnew-maheshkumar09104s-projects.vercel.app
