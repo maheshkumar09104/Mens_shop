@@ -41,6 +41,9 @@ function Navbar() {
           <NavLink to="/wishlist" className="text-white/85 transition hover:text-white">
             <FaHeart aria-label="Wishlist" size={20} />
           </NavLink>
+          <NavLink to="/admin" className={linkClass}>
+            Admin
+          </NavLink>
           {user ? (
             <button
               type="button"

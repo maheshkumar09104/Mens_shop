@@ -14,10 +14,14 @@ import WishlistPage from "./pages/WishlistPage.jsx";
 import useAuthStore from "./store/authStore.js";
 
 function AdminRoute({ children }) {
-  const { hasLoaded, isAdmin } = useAuthStore();
+  const { hasLoaded, user, isAdmin } = useAuthStore();
 
   if (!hasLoaded) {
     return <div className="py-10 text-center font-bold text-[#1a2e4a]">Loading admin area...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
   }
 
   if (!isAdmin) {
