@@ -7,7 +7,7 @@ const {
   deleteProduct
 } = require("../controllers/productController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
-const upload = require("../middleware/uploadMiddleware");
+const { upload } = require("../config/cloudinary");
 
 const router = express.Router();
 

@@ -1,15 +1,18 @@
 const Product = require("../models/Product");
 
+const DEFAULT_PRODUCT_IMAGE =
+  "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500";
+
 const getUploadedImageUrl = (req) => {
   if (!req.file) {
     return null;
   }
 
-  return `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+  return req.file.path;
 };
 
 const getProductPayload = (req) => {
-  const { name, description, price, category, stock } = req.body;
+  const { name, description, price, category, stock, imageUrl } = req.body;
   const payload = {
     name,
     description,
@@ -21,6 +24,10 @@ const getProductPayload = (req) => {
 
   if (image) {
     payload.image = image;
+  } else if (imageUrl) {
+    payload.image = imageUrl;
+  } else if (!req.params.id) {
+    payload.image = DEFAULT_PRODUCT_IMAGE;
   }
 
   return payload;

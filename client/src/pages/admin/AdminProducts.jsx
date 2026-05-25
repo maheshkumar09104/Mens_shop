@@ -11,6 +11,8 @@ const emptyForm = {
   price: "",
   category: "T-Shirts",
   stock: 0,
+  imageMode: "upload",
+  imageUrl: "",
   imageFile: null,
   imagePreview: ""
 };
@@ -79,6 +81,8 @@ function AdminProducts() {
       price: product.price || "",
       category: product.category || "T-Shirts",
       stock: product.stock || 0,
+      imageMode: "url",
+      imageUrl: getImageUrl(product.image),
       imageFile: null,
       imagePreview: getImageUrl(product.image)
     });
@@ -110,6 +114,34 @@ function AdminProducts() {
     }));
   };
 
+  const handleImageModeChange = (mode) => {
+    setFormData((current) => ({
+      ...current,
+      imageMode: mode,
+      imageFile: null,
+      imagePreview: mode === "url" ? current.imageUrl : ""
+    }));
+  };
+
+  const handleImageUrlChange = (event) => {
+    const imageUrl = event.target.value;
+
+    setFormData((current) => ({
+      ...current,
+      imageUrl,
+      imagePreview: imageUrl
+    }));
+  };
+
+  const buildProductJson = () => ({
+    name: formData.name,
+    description: formData.description,
+    price: Number(formData.price),
+    category: formData.category,
+    stock: Number(formData.stock),
+    imageUrl: formData.imageUrl
+  });
+
   const buildProductFormData = () => {
     const productFormData = new FormData();
 
@@ -131,19 +163,23 @@ function AdminProducts() {
     setSaving(true);
 
     try {
-      const requestConfig = {
-        headers: {
-          ...authHeaders,
-          "Content-Type": "multipart/form-data"
-        }
-      };
+      const isUrlMode = formData.imageMode === "url";
+      const payload = isUrlMode ? buildProductJson() : buildProductFormData();
+      const requestConfig = isUrlMode
+        ? { headers: authHeaders }
+        : {
+            headers: {
+              ...authHeaders,
+              "Content-Type": "multipart/form-data"
+            }
+          };
 
       if (editingProduct) {
-        const { data } = await api.put(`/products/${editingProduct._id}`, buildProductFormData(), requestConfig);
+        const { data } = await api.put(`/products/${editingProduct._id}`, payload, requestConfig);
         setProducts((current) => current.map((product) => (product._id === data._id ? data : product)));
         toast.success("Product updated successfully");
       } else {
-        const { data } = await api.post("/products", buildProductFormData(), requestConfig);
+        const { data } = await api.post("/products", payload, requestConfig);
         setProducts((current) => [data, ...current]);
         toast.success("Product added successfully");
       }
@@ -348,19 +384,56 @@ function AdminProducts() {
                 />
               </div>
 
-              <div>
-                <label className="text-sm font-bold text-[#1a2e4a]" htmlFor="image">
-                  Image Upload
-                </label>
-                <input
-                  id="image"
-                  name="image"
-                  type="file"
-                  accept="image/png,image/jpeg,image/jpg,image/webp"
-                  onChange={handleImageChange}
-                  className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[#1a2e4a] file:px-3 file:py-2 file:font-bold file:text-white"
-                />
+              <div className="md:col-span-2">
+                <p className="text-sm font-bold text-[#1a2e4a]">Product Image</p>
+                <div className="mt-2 grid grid-cols-2 rounded-md border border-slate-300 bg-slate-100 p-1">
+                  {["upload", "url"].map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => handleImageModeChange(mode)}
+                      className={`rounded px-3 py-2 text-sm font-bold transition ${
+                        formData.imageMode === mode
+                          ? "bg-[#1a2e4a] text-white"
+                          : "text-[#1a2e4a] hover:bg-white"
+                      }`}
+                    >
+                      {mode === "upload" ? "Upload Image" : "Use Image URL"}
+                    </button>
+                  ))}
+                </div>
               </div>
+
+              {formData.imageMode === "upload" ? (
+                <div className="md:col-span-2">
+                  <label className="text-sm font-bold text-[#1a2e4a]" htmlFor="image">
+                    Upload Image
+                  </label>
+                  <input
+                    id="image"
+                    name="image"
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                    onChange={handleImageChange}
+                    className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[#1a2e4a] file:px-3 file:py-2 file:font-bold file:text-white"
+                  />
+                </div>
+              ) : (
+                <div className="md:col-span-2">
+                  <label className="text-sm font-bold text-[#1a2e4a]" htmlFor="imageUrl">
+                    Image URL
+                  </label>
+                  <input
+                    id="imageUrl"
+                    name="imageUrl"
+                    type="url"
+                    value={formData.imageUrl}
+                    onChange={handleImageUrlChange}
+                    placeholder="https://example.com/product.jpg"
+                    className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 outline-none focus:border-[#c9a84c] focus:ring-2 focus:ring-[#c9a84c]/30"
+                  />
+                </div>
+              )}
 
               <div className="md:col-span-2">
                 <p className="text-sm font-bold text-[#1a2e4a]">Image Preview</p>
