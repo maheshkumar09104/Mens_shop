@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import {
   FaBars,
   FaHeart,
@@ -15,6 +15,7 @@ import useCartStore from "../store/cartStore";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { pathname } = useLocation();
   const { user, isAdmin, logout } = useAuthStore();
   const cartCount = useCartStore((state) =>
     state.cartItems.reduce((total, item) => total + item.quantity, 0)
@@ -28,6 +29,11 @@ function Navbar() {
     logout();
     closeMenu();
   };
+  const isAuthPage = ["/login", "/register", "/admin/login"].includes(pathname);
+  const authLink =
+    pathname === "/admin/login"
+      ? { to: "/login", label: "Customer Login" }
+      : { to: "/admin/login", label: "Admin Login" };
 
   return (
     <header className="border-b border-amber-300/30 bg-[#0B1F3A] text-white shadow-sm">
@@ -40,17 +46,26 @@ function Navbar() {
             Mens Shop
           </Link>
 
-          <button
-            type="button"
-            onClick={() => setMenuOpen((current) => !current)}
-            className="grid h-10 w-10 place-items-center rounded-md border border-white/20 md:hidden"
-            aria-label="Toggle navigation"
-          >
-            {menuOpen ? <FaTimes /> : <FaBars />}
-          </button>
+          {!isAuthPage && (
+            <button
+              type="button"
+              onClick={() => setMenuOpen((current) => !current)}
+              className="grid h-10 w-10 place-items-center rounded-md border border-white/20 md:hidden"
+              aria-label="Toggle navigation"
+            >
+              {menuOpen ? <FaTimes /> : <FaBars />}
+            </button>
+          )}
 
           <div className="hidden items-center gap-5 md:flex">
-            {isAdmin ? (
+            {isAuthPage ? (
+              <NavLink
+                to={authLink.to}
+                className="inline-flex items-center gap-2 rounded-md border border-amber-300 px-3 py-2 text-sm font-bold text-amber-200 transition hover:bg-amber-300 hover:text-[#0B1F3A]"
+              >
+                <FaUser /> {authLink.label}
+              </NavLink>
+            ) : isAdmin ? (
               <>
                 <NavLink to="/admin" className={linkClass}>
                   Admin
@@ -108,7 +123,19 @@ function Navbar() {
           </div>
         </div>
 
-        {menuOpen && (
+        {isAuthPage && (
+          <div className="mt-4 md:hidden">
+            <NavLink
+              to={authLink.to}
+              onClick={closeMenu}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-amber-300 px-3 py-2 text-sm font-bold text-amber-200 transition hover:bg-amber-300 hover:text-[#0B1F3A]"
+            >
+              <FaUser /> {authLink.label}
+            </NavLink>
+          </div>
+        )}
+
+        {!isAuthPage && menuOpen && (
           <div className="mt-4 grid gap-3 rounded-lg border border-white/10 bg-white/10 p-4 md:hidden">
             {isAdmin ? (
               <>
