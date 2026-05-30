@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import ProductCard from "../components/ProductCard.jsx";
 import api from "../services/api";
+import { FaFilter } from "react-icons/fa";
 
 const categories = ["T-Shirts", "Shirts", "Pants", "Shoes", "Accessories"];
 
@@ -12,6 +13,7 @@ function ProductsPage() {
   const [sort, setSort] = useState("");
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const wishlistIds = useMemo(() => wishlist.map((item) => item._id), [wishlist]);
 
@@ -71,12 +73,12 @@ function ProductsPage() {
   };
 
   return (
-    <section className="space-y-8">
-      <div className="rounded-lg bg-[#1a2e4a] px-6 py-8 text-white shadow-sm">
+    <section className="space-y-6 px-1 sm:px-0">
+      <div className="rounded-lg bg-[#1a2e4a] px-4 py-7 text-white shadow-sm sm:px-6 sm:py-8">
         <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Mens Shop Collection</p>
         <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h1 className="text-3xl font-black md:text-4xl">Products</h1>
+            <h1 className="text-2xl font-black sm:text-3xl md:text-4xl">Products</h1>
             <p className="mt-2 max-w-2xl text-white/75">
               Browse polished essentials with classic styling, sharp details, and everyday comfort.
             </p>
@@ -97,8 +99,20 @@ function ProductsPage() {
         </div>
       </div>
 
+      <button
+        type="button"
+        onClick={() => setFiltersOpen((current) => !current)}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-[#1a2e4a] bg-white px-4 py-3 font-bold text-[#1a2e4a] shadow-sm lg:hidden"
+      >
+        <FaFilter /> {filtersOpen ? "Hide Filters" : "Show Filters"}
+      </button>
+
       <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
-        <aside className="h-fit rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <aside
+          className={`h-fit rounded-lg border border-slate-200 bg-white p-5 shadow-sm ${
+            filtersOpen ? "block" : "hidden"
+          } lg:block`}
+        >
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-black text-[#1a2e4a]">Filters</h2>
             <button type="button" onClick={clearFilters} className="text-sm font-bold text-[#c9a84c]">

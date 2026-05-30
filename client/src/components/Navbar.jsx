@@ -1,66 +1,161 @@
+import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { FaHeart, FaSignOutAlt, FaShoppingBag, FaShoppingCart, FaUser } from "react-icons/fa";
+import {
+  FaBars,
+  FaHeart,
+  FaSignOutAlt,
+  FaShoppingBag,
+  FaShoppingCart,
+  FaTimes,
+  FaUser,
+  FaUserCircle
+} from "react-icons/fa";
 import useAuthStore from "../store/authStore.js";
 import useCartStore from "../store/cartStore";
 
 function Navbar() {
-  const { user, logout } = useAuthStore();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { user, isAdmin, logout } = useAuthStore();
   const cartCount = useCartStore((state) =>
     state.cartItems.reduce((total, item) => total + item.quantity, 0)
   );
 
+  const closeMenu = () => setMenuOpen(false);
   const linkClass = ({ isActive }) =>
-    `text-sm font-semibold transition ${
-      isActive ? "text-amber-300" : "text-white/85 hover:text-white"
-    }`;
+    `text-sm font-semibold transition ${isActive ? "text-amber-300" : "text-white/85 hover:text-white"}`;
+
+  const logoutAndClose = () => {
+    logout();
+    closeMenu();
+  };
 
   return (
     <header className="border-b border-amber-300/30 bg-[#0B1F3A] text-white shadow-sm">
-      <nav className="page-shell flex min-h-16 flex-col gap-4 py-4 md:flex-row md:items-center md:justify-between">
-        <Link to="/" className="flex items-center gap-2 text-xl font-black tracking-wide">
-          <span className="grid h-10 w-10 place-items-center rounded-md border border-amber-300 text-amber-300">
-            <FaShoppingBag />
-          </span>
-          Mens Shop
-        </Link>
-        <div className="flex flex-wrap items-center gap-5">
-          <NavLink to="/" className={linkClass}>
-            Home
-          </NavLink>
-          <NavLink to="/products" className={linkClass}>
-            Products
-          </NavLink>
-          <NavLink to="/cart" className="relative text-white/85 transition hover:text-white">
-            <FaShoppingCart aria-label="Cart" size={21} />
-            {cartCount > 0 && (
-              <span className="absolute -right-3 -top-3 grid h-5 w-5 place-items-center rounded-full bg-amber-400 text-xs font-bold text-[#0B1F3A]">
-                {cartCount}
-              </span>
+      <nav className="page-shell py-4">
+        <div className="flex items-center justify-between gap-4">
+          <Link to="/" onClick={closeMenu} className="flex items-center gap-2 text-xl font-black tracking-wide">
+            <span className="grid h-10 w-10 place-items-center rounded-md border border-amber-300 text-amber-300">
+              <FaShoppingBag />
+            </span>
+            Mens Shop
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setMenuOpen((current) => !current)}
+            className="grid h-10 w-10 place-items-center rounded-md border border-white/20 md:hidden"
+            aria-label="Toggle navigation"
+          >
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+
+          <div className="hidden items-center gap-5 md:flex">
+            {isAdmin ? (
+              <>
+                <NavLink to="/admin" className={linkClass}>
+                  Admin
+                </NavLink>
+                <button
+                  type="button"
+                  onClick={logoutAndClose}
+                  className="inline-flex items-center gap-2 rounded-md border border-amber-300 px-3 py-2 text-sm font-bold text-amber-200 transition hover:bg-amber-300 hover:text-[#0B1F3A]"
+                >
+                  <FaSignOutAlt /> Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <NavLink to="/" className={linkClass}>
+                  Home
+                </NavLink>
+                <NavLink to="/products" className={linkClass}>
+                  Products
+                </NavLink>
+                <NavLink to="/cart" className="relative text-white/85 transition hover:text-white">
+                  <FaShoppingCart aria-label="Cart" size={21} />
+                  {cartCount > 0 && (
+                    <span className="absolute -right-3 -top-3 grid h-5 w-5 place-items-center rounded-full bg-amber-400 text-xs font-bold text-[#0B1F3A]">
+                      {cartCount}
+                    </span>
+                  )}
+                </NavLink>
+                <NavLink to="/wishlist" className="text-white/85 transition hover:text-white">
+                  <FaHeart aria-label="Wishlist" size={20} />
+                </NavLink>
+                {user && (
+                  <NavLink to="/profile" className="text-white/85 transition hover:text-white">
+                    <FaUserCircle aria-label="Profile" size={22} />
+                  </NavLink>
+                )}
+                {user ? (
+                  <button
+                    type="button"
+                    onClick={logoutAndClose}
+                    className="inline-flex items-center gap-2 rounded-md border border-amber-300 px-3 py-2 text-sm font-bold text-amber-200 transition hover:bg-amber-300 hover:text-[#0B1F3A]"
+                  >
+                    <FaSignOutAlt /> Logout
+                  </button>
+                ) : (
+                  <NavLink
+                    to="/login"
+                    className="inline-flex items-center gap-2 rounded-md border border-amber-300 px-3 py-2 text-sm font-bold text-amber-200 transition hover:bg-amber-300 hover:text-[#0B1F3A]"
+                  >
+                    <FaUser /> Customer Login
+                  </NavLink>
+                )}
+              </>
             )}
-          </NavLink>
-          <NavLink to="/wishlist" className="text-white/85 transition hover:text-white">
-            <FaHeart aria-label="Wishlist" size={20} />
-          </NavLink>
-          <NavLink to={user ? "/admin" : "/admin/login"} className={linkClass}>
-            Admin
-          </NavLink>
-          {user ? (
-            <button
-              type="button"
-              onClick={logout}
-              className="inline-flex items-center gap-2 rounded-md border border-amber-300 px-3 py-2 text-sm font-bold text-amber-200 transition hover:bg-amber-300 hover:text-[#0B1F3A]"
-            >
-              <FaSignOutAlt /> Logout
-            </button>
-          ) : (
-            <NavLink
-              to="/login"
-              className="inline-flex items-center gap-2 rounded-md border border-amber-300 px-3 py-2 text-sm font-bold text-amber-200 transition hover:bg-amber-300 hover:text-[#0B1F3A]"
-            >
-              <FaUser /> Login
-            </NavLink>
-          )}
+          </div>
         </div>
+
+        {menuOpen && (
+          <div className="mt-4 grid gap-3 rounded-lg border border-white/10 bg-white/10 p-4 md:hidden">
+            {isAdmin ? (
+              <>
+                <NavLink to="/admin" onClick={closeMenu} className={linkClass}>
+                  Admin
+                </NavLink>
+                <button type="button" onClick={logoutAndClose} className="text-left text-sm font-bold text-amber-200">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <NavLink to="/" onClick={closeMenu} className={linkClass}>
+                  Home
+                </NavLink>
+                <NavLink to="/products" onClick={closeMenu} className={linkClass}>
+                  Products
+                </NavLink>
+                <NavLink to="/cart" onClick={closeMenu} className={linkClass}>
+                  Cart ({cartCount})
+                </NavLink>
+                <NavLink to="/wishlist" onClick={closeMenu} className={linkClass}>
+                  Wishlist
+                </NavLink>
+                {user && (
+                  <NavLink to="/profile" onClick={closeMenu} className={linkClass}>
+                    Profile
+                  </NavLink>
+                )}
+                {user ? (
+                  <button type="button" onClick={logoutAndClose} className="text-left text-sm font-bold text-amber-200">
+                    Logout
+                  </button>
+                ) : (
+                  <>
+                    <NavLink to="/login" onClick={closeMenu} className={linkClass}>
+                      Customer Login
+                    </NavLink>
+                    <NavLink to="/admin/login" onClick={closeMenu} className={linkClass}>
+                      Admin Login
+                    </NavLink>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </nav>
     </header>
   );

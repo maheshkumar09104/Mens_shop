@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { FaEdit, FaImage, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
 import api from "../../services/api";
 import useAuthStore from "../../store/authStore";
+import formatCurrency from "../../utils/formatCurrency";
 import AdminLayout from "./AdminLayout";
 
 const emptyForm = {
@@ -227,7 +228,7 @@ function AdminProducts() {
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full min-w-[860px] text-left text-sm">
             <thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600">
               <tr>
@@ -257,7 +258,7 @@ function AdminProducts() {
                   </td>
                   <td className="px-5 py-4 font-bold text-[#1a2e4a]">{product.name}</td>
                   <td className="px-5 py-4">{product.category}</td>
-                  <td className="px-5 py-4">${Number(product.price || 0).toFixed(2)}</td>
+                  <td className="px-5 py-4">{formatCurrency(product.price)}</td>
                   <td className="px-5 py-4">{product.stock}</td>
                   <td className="px-5 py-4">
                     <div className="flex justify-end gap-2">
@@ -289,6 +290,50 @@ function AdminProducts() {
               )}
             </tbody>
           </table>
+        </div>
+
+        <div className="grid gap-4 p-4 md:hidden">
+          {products.map((product) => (
+            <article key={product._id} className="rounded-lg border border-slate-200 p-4">
+              <div className="flex gap-4">
+                {product.image ? (
+                  <img
+                    src={getImageUrl(product.image)}
+                    alt={product.name}
+                    className="h-20 w-20 rounded-md object-cover"
+                  />
+                ) : (
+                  <div className="grid h-20 w-20 shrink-0 place-items-center rounded-md bg-slate-100 text-slate-400">
+                    <FaImage />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate font-black text-[#1a2e4a]">{product.name}</h3>
+                  <p className="mt-1 text-sm text-slate-600">{product.category}</p>
+                  <p className="mt-2 font-black text-[#1a2e4a]">{formatCurrency(product.price)}</p>
+                  <p className="mt-1 text-sm text-slate-600">Stock: {product.stock}</p>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => openEditModal(product)}
+                  className="inline-flex items-center justify-center gap-2 rounded-md border border-[#c9a84c] px-3 py-2 font-bold text-[#1a2e4a] transition hover:bg-[#c9a84c]"
+                >
+                  <FaEdit /> Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(product._id)}
+                  className="inline-flex items-center justify-center gap-2 rounded-md border border-red-200 px-3 py-2 font-bold text-red-600 transition hover:bg-red-50"
+                >
+                  <FaTrash /> Delete
+                </button>
+              </div>
+            </article>
+          ))}
+
+          {!loading && products.length === 0 && <p className="py-6 text-center text-slate-600">No products found.</p>}
         </div>
       </div>
 

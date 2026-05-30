@@ -29,7 +29,7 @@ function RegisterPage() {
 
       login(user, token);
       toast.success("Account created successfully");
-      navigate("/");
+      navigate("/products");
     } catch (error) {
       toast.error(error.response?.data?.message || "Registration failed. Please try again.");
     } finally {

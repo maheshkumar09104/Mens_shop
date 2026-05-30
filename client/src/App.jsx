@@ -8,8 +8,10 @@ import AdminProducts from "./pages/admin/AdminProducts.jsx";
 import CartPage from "./pages/CartPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage.jsx";
 import ProductDetailPage from "./pages/ProductDetailPage.jsx";
 import ProductsPage from "./pages/ProductsPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import WishlistPage from "./pages/WishlistPage.jsx";
 import useAuthStore from "./store/authStore.js";
@@ -49,6 +51,9 @@ function App() {
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/orders" element={<ProfilePage />} />
+          <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import api from "../../services/api";
+import formatCurrency from "../../utils/formatCurrency";
 import AdminLayout from "./AdminLayout";
 
 function AdminOrders() {
@@ -58,7 +59,7 @@ function AdminOrders() {
                     <p className="font-bold text-[#1a2e4a]">{order.user?.name || "Customer"}</p>
                     <p className="text-xs text-slate-500">{order.user?.email || order.user}</p>
                   </td>
-                  <td className="px-5 py-4 font-bold">${Number(order.totalPrice || 0).toFixed(2)}</td>
+                  <td className="px-5 py-4 font-bold">{formatCurrency(order.totalPrice)}</td>
                   <td className="px-5 py-4">
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-bold ${

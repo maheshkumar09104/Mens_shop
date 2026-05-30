@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { FaCartPlus, FaHeart, FaRegHeart, FaStar } from "react-icons/fa";
 import useCartStore from "../store/cartStore";
+import formatCurrency from "../utils/formatCurrency";
 
 function ProductCard({ product, isWishlisted = false, onToggleWishlist }) {
   const addToCart = useCartStore((state) => state.addToCart);
   const imageUrl =
     product.image ||
     "https://images.unsplash.com/photo-1516826957135-700dedea698c?auto=format&fit=crop&w=900&q=80";
+  const rating = Number(product.avgRating ?? product.ratings ?? 0);
 
   const handleAddToCart = () => {
     addToCart(product);
@@ -51,9 +53,9 @@ function ProductCard({ product, isWishlisted = false, onToggleWishlist }) {
         </p>
 
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-black text-[#1a2e4a]">${Number(product.price || 0).toFixed(2)}</span>
+          <span className="text-2xl font-black text-[#1a2e4a]">{formatCurrency(product.price)}</span>
           <span className="flex items-center gap-1 text-sm font-bold text-[#c9a84c]">
-            <FaStar /> {product.ratings || 0}
+            <FaStar /> {rating.toFixed(1)} ({product.numReviews || 0})
           </span>
         </div>
 

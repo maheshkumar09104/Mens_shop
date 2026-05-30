@@ -34,7 +34,7 @@ function LoginPage() {
 
       login(user, token);
       toast.success("Welcome back to Mens Shop");
-      navigate("/");
+      navigate("/products");
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed. Please try again.");
     } finally {

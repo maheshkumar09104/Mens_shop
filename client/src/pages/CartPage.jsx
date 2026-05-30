@@ -1,11 +1,26 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaMinus, FaPlus, FaShoppingBag, FaTrash } from "react-icons/fa";
 import useCartStore from "../store/cartStore";
+import formatCurrency from "../utils/formatCurrency";
 
 function CartPage() {
+  const navigate = useNavigate();
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCartStore();
   const subtotal = cartItems.reduce((sum, item) => sum + Number(item.price || 0) * item.quantity, 0);
   const total = subtotal;
+
+  const handleCheckout = () => {
+    const order = {
+      _id: `ORD-${Date.now()}`,
+      orderItems: cartItems,
+      totalPrice: total,
+      createdAt: new Date().toISOString()
+    };
+
+    localStorage.setItem("mensShopLastOrder", JSON.stringify(order));
+    clearCart();
+    navigate("/order-confirmation", { state: { order } });
+  };
 
   return (
     <section className="space-y-8">
@@ -56,7 +71,7 @@ function CartPage() {
                       {item.category || "Menswear"}
                     </p>
                     <h2 className="mt-1 text-lg font-black text-[#1a2e4a]">{item.name}</h2>
-                    <p className="mt-2 text-sm font-bold text-slate-700">${Number(item.price || 0).toFixed(2)}</p>
+                    <p className="mt-2 text-sm font-bold text-slate-700">{formatCurrency(item.price)}</p>
                   </div>
 
                   <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
@@ -105,7 +120,7 @@ function CartPage() {
             <div className="mt-5 space-y-4 text-sm">
               <div className="flex justify-between text-slate-600">
                 <span>Subtotal</span>
-                <span className="font-bold text-[#1a2e4a]">${subtotal.toFixed(2)}</span>
+                <span className="font-bold text-[#1a2e4a]">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>Shipping</span>
@@ -113,12 +128,13 @@ function CartPage() {
               </div>
               <div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-black text-[#1a2e4a]">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{formatCurrency(total)}</span>
               </div>
             </div>
 
             <button
               type="button"
+              onClick={handleCheckout}
               className="mt-6 w-full rounded-md bg-[#c9a84c] px-5 py-3 font-black text-[#1a2e4a] transition hover:bg-[#d6b85f]"
             >
               Proceed to Checkout

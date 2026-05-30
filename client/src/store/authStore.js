@@ -33,6 +33,24 @@ const useAuthStore = create((set) => ({
       hasLoaded: true
     });
   },
+  updateUser: (updates) => {
+    set((state) => {
+      if (!state.user) {
+        return state;
+      }
+
+      const user = { ...state.user, ...updates };
+      const authData = { user, token: state.token };
+
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+      localStorage.setItem("mensShopUser", JSON.stringify({ ...user, token: state.token }));
+
+      return {
+        user,
+        isAdmin: getIsAdmin(user)
+      };
+    });
+  },
   loadUser: () => {
     const storedAuth = JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || "null");
     const legacyUser = JSON.parse(localStorage.getItem("mensShopUser") || "null");

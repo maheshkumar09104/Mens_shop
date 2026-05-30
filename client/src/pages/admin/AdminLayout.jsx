@@ -22,13 +22,13 @@ function AdminLayout({ title, subtitle, children }) {
   return (
     <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
       <div className="grid min-h-[680px] lg:grid-cols-[260px_1fr]">
-        <aside className="bg-[#1a2e4a] p-6 text-white">
+        <aside className="bg-[#1a2e4a] p-4 text-white sm:p-6">
           <div>
             <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Mens Shop</p>
             <h2 className="mt-2 text-2xl font-black">Admin</h2>
           </div>
 
-          <nav className="mt-8 space-y-2">
+          <nav className="mt-6 grid gap-2 sm:grid-cols-3 lg:mt-8 lg:block lg:space-y-2">
             {adminLinks.map(({ to, label, icon: Icon }) => (
               <NavLink
                 key={to}
@@ -48,10 +48,10 @@ function AdminLayout({ title, subtitle, children }) {
           </nav>
         </aside>
 
-        <div className="bg-slate-50 p-6">
-          <header className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="bg-slate-50 p-4 sm:p-6">
+          <header className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Admin Panel</p>
-            <h1 className="mt-2 text-3xl font-black text-[#1a2e4a]">{title}</h1>
+            <h1 className="mt-2 text-2xl font-black text-[#1a2e4a] sm:text-3xl">{title}</h1>
             {subtitle && <p className="mt-2 text-slate-600">{subtitle}</p>}
           </header>
 

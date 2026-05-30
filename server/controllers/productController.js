@@ -99,10 +99,45 @@ const deleteProduct = async (req, res) => {
   return res.json({ message: "Product removed" });
 };
 
+const addReview = async (req, res) => {
+  const { rating, comment } = req.body;
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  if (req.user.role === "admin") {
+    return res.status(403).json({ message: "Admins cannot review products" });
+  }
+
+  const alreadyReviewed = product.reviews.some((review) => review.user.toString() === req.user._id.toString());
+
+  if (alreadyReviewed) {
+    return res.status(400).json({ message: "Product already reviewed" });
+  }
+
+  product.reviews.push({
+    user: req.user._id,
+    name: req.user.name,
+    rating: Number(rating),
+    comment
+  });
+
+  product.numReviews = product.reviews.length;
+  product.avgRating =
+    product.reviews.reduce((total, review) => total + review.rating, 0) / product.reviews.length;
+  product.ratings = product.avgRating;
+
+  const updatedProduct = await product.save();
+  return res.status(201).json(updatedProduct);
+};
+
 module.exports = {
   getAllProducts,
   getProductById,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  addReview
 };

@@ -1,55 +1,41 @@
-import { Link } from "react-router-dom";
-import { FaTachometerAlt } from "react-icons/fa";
+import { Link, Navigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 
 function HomePage() {
-  const { isAdmin } = useAuthStore();
+  const { hasLoaded, user, isAdmin } = useAuthStore();
+
+  if (!hasLoaded) {
+    return <div className="py-10 text-center font-bold text-[#1a2e4a]">Loading...</div>;
+  }
+
+  if (user && isAdmin) {
+    return <Navigate to="/admin" replace />;
+  }
+
+  if (user) {
+    return <Navigate to="/products" replace />;
+  }
 
   return (
-    <div className="space-y-6">
-      {isAdmin && (
-        <div className="rounded-lg border border-[#c9a84c]/40 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Admin Access</p>
-              <h2 className="mt-1 text-xl font-black text-[#1a2e4a]">Manage Mens Shop</h2>
-            </div>
-            <Link
-              to="/admin"
-              className="inline-flex items-center justify-center gap-2 rounded-md bg-[#1a2e4a] px-5 py-3 font-bold text-white transition hover:bg-[#233d62]"
-            >
-              <FaTachometerAlt /> Open Admin Dashboard
-            </Link>
-          </div>
-        </div>
-      )}
-
-      <section className="grid gap-8 rounded-lg bg-[#0B1F3A] p-8 text-white shadow-sm lg:grid-cols-[1fr_360px]">
-        <div className="max-w-2xl">
-          <p className="text-sm font-bold uppercase tracking-wide text-amber-300">Classic menswear</p>
-          <h1 className="mt-4 text-4xl font-black leading-tight md:text-5xl">Mens Shop</h1>
-          <p className="mt-5 text-lg leading-8 text-white/75">
-            A professional shopping experience for shirts, t-shirts, pants, shoes, and accessories.
-          </p>
+    <section className="mx-auto grid min-h-[calc(100vh-150px)] max-w-4xl place-items-center rounded-lg bg-[#0B1F3A] px-4 py-12 text-center text-white shadow-sm">
+      <div>
+        <h1 className="text-4xl font-black sm:text-5xl md:text-6xl">Mens Shop</h1>
+        <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
           <Link
-            to="/products"
-            className="mt-8 inline-flex rounded-md bg-amber-300 px-5 py-3 font-bold text-[#0B1F3A] transition hover:bg-amber-200"
+            to="/admin/login"
+            className="rounded-md bg-[#c9a84c] px-6 py-3 font-black text-[#0B1F3A] transition hover:bg-[#d8bd67]"
           >
-            Browse Products
+            Admin Login
+          </Link>
+          <Link
+            to="/login"
+            className="rounded-md border border-[#c9a84c] px-6 py-3 font-black text-[#c9a84c] transition hover:bg-[#c9a84c] hover:text-[#0B1F3A]"
+          >
+            Customer Login
           </Link>
         </div>
-        <div className="rounded-lg border border-white/15 bg-white/10 p-6">
-          <p className="text-sm font-bold text-amber-200">Featured Categories</p>
-          <div className="mt-4 grid gap-3">
-            {["T-Shirts", "Shirts", "Pants", "Shoes", "Accessories"].map((category) => (
-              <div key={category} className="rounded-md bg-white px-4 py-3 font-bold text-[#0B1F3A]">
-                {category}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }
 

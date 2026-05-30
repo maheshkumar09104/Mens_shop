@@ -4,7 +4,8 @@ const {
   getProductById,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  addReview
 } = require("../controllers/productController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 const { upload } = require("../config/cloudinary");
@@ -17,5 +18,6 @@ router
   .get(getProductById)
   .put(protect, adminOnly, upload.single("image"), updateProduct)
   .delete(protect, adminOnly, deleteProduct);
+router.post("/:id/review", protect, addReview);
 
 module.exports = router;
