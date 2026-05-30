@@ -1,25 +1,52 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { toast } from "react-toastify";
 import { FaMinus, FaPlus, FaShoppingBag, FaTrash } from "react-icons/fa";
+import api from "../services/api";
+import useAuthStore from "../store/authStore";
 import useCartStore from "../store/cartStore";
 import formatCurrency from "../utils/formatCurrency";
 
 function CartPage() {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCartStore();
+  const [placingOrder, setPlacingOrder] = useState(false);
   const subtotal = cartItems.reduce((sum, item) => sum + Number(item.price || 0) * item.quantity, 0);
   const total = subtotal;
 
-  const handleCheckout = () => {
-    const order = {
-      _id: `ORD-${Date.now()}`,
-      orderItems: cartItems,
-      totalPrice: total,
-      createdAt: new Date().toISOString()
-    };
+  const handleCheckout = async () => {
+    if (!user) {
+      toast.error("Please login to place your order");
+      navigate("/login");
+      return;
+    }
 
-    localStorage.setItem("mensShopLastOrder", JSON.stringify(order));
-    clearCart();
-    navigate("/order-confirmation", { state: { order } });
+    setPlacingOrder(true);
+
+    try {
+      const orderItems = cartItems.map((item) => ({
+        product: item.product || item._id,
+        name: item.name,
+        image: item.image,
+        price: Number(item.price || 0),
+        quantity: Number(item.quantity || 1)
+      }));
+
+      const { data: order } = await api.post("/orders", {
+        orderItems,
+        totalPrice: total
+      });
+
+      localStorage.setItem("mensShopLastOrder", JSON.stringify(order));
+      clearCart();
+      toast.success("Order placed successfully");
+      navigate("/order-confirmation", { state: { order } });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to place order");
+    } finally {
+      setPlacingOrder(false);
+    }
   };
 
   return (
@@ -135,9 +162,10 @@ function CartPage() {
             <button
               type="button"
               onClick={handleCheckout}
-              className="mt-6 w-full rounded-md bg-[#c9a84c] px-5 py-3 font-black text-[#1a2e4a] transition hover:bg-[#d6b85f]"
+              disabled={placingOrder}
+              className="mt-6 w-full rounded-md bg-[#c9a84c] px-5 py-3 font-black text-[#1a2e4a] transition hover:bg-[#d6b85f] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Proceed to Checkout
+              {placingOrder ? "Placing Order..." : "Proceed to Checkout"}
             </button>
             <Link
               to="/products"
