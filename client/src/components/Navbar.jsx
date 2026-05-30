@@ -30,6 +30,8 @@ function Navbar() {
     closeMenu();
   };
   const isAuthPage = ["/login", "/register", "/admin/login"].includes(pathname);
+  const isLandingPage = pathname === "/" && !user;
+  const isMinimalPage = isAuthPage || isLandingPage;
   const authLink =
     pathname === "/admin/login"
       ? { to: "/login", label: "Customer Login" }
@@ -46,7 +48,7 @@ function Navbar() {
             Mens Shop
           </Link>
 
-          {!isAuthPage && (
+          {!isMinimalPage && (
             <button
               type="button"
               onClick={() => setMenuOpen((current) => !current)}
@@ -58,7 +60,7 @@ function Navbar() {
           )}
 
           <div className="hidden items-center gap-5 md:flex">
-            {isAuthPage ? (
+            {isLandingPage ? null : isAuthPage ? (
               <NavLink
                 to={authLink.to}
                 className="inline-flex items-center gap-2 rounded-md border border-amber-300 px-3 py-2 text-sm font-bold text-amber-200 transition hover:bg-amber-300 hover:text-[#0B1F3A]"
@@ -135,7 +137,7 @@ function Navbar() {
           </div>
         )}
 
-        {!isAuthPage && menuOpen && (
+        {!isMinimalPage && menuOpen && (
           <div className="mt-4 grid gap-3 rounded-lg border border-white/10 bg-white/10 p-4 md:hidden">
             {isAdmin ? (
               <>
