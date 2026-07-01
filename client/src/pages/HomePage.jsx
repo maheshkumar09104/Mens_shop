@@ -19,7 +19,7 @@ function HomePage() {
   return (
     <section className="mx-auto grid min-h-[calc(100vh-150px)] max-w-4xl place-items-center rounded-lg bg-[#0B1F3A] px-4 py-12 text-center text-white shadow-sm">
       <div>
-        <h1 className="text-4xl font-black sm:text-5xl md:text-6xl">Mens Shop</h1>
+        <h1 className="text-4xl font-black sm:text-5xl md:text-6xl">Focus Mens Shop</h1>
         <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
           <Link
             to="/admin/login"

@@ -75,7 +75,7 @@ function ProductsPage() {
   return (
     <section className="space-y-6 px-1 sm:px-0">
       <div className="rounded-lg bg-[#1a2e4a] px-4 py-7 text-white shadow-sm sm:px-6 sm:py-8">
-        <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Mens Shop Collection</p>
+        <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]"> Focus Mens Shop Collection</p>
         <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h1 className="text-2xl font-black sm:text-3xl md:text-4xl">Products</h1>

@@ -7,7 +7,7 @@ function Home() {
       <div className="page-shell grid min-h-[calc(100vh-64px)] items-center gap-10 py-12 md:grid-cols-[1fr_0.9fr]">
         <div className="max-w-xl">
           <p className="text-sm font-bold uppercase text-copper">Modern essentials for men</p>
-          <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">Mens Shop</h1>
+          <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">Focus Mens Shop</h1>
           <p className="mt-5 text-lg leading-8 text-slate-600">
             Build a sharper wardrobe with everyday shirts, denim, shoes, jackets, and accessories.
           </p>
