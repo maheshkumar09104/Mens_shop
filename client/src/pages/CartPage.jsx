@@ -52,7 +52,7 @@ function CartPage() {
   return (
     <section className="space-y-8">
       <div className="rounded-lg bg-[#1a2e4a] px-6 py-8 text-white shadow-sm">
-        <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Mens Shop Checkout</p>
+        <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Focus Mens shop Checkout</p>
         <h1 className="mt-2 text-3xl font-black md:text-4xl">Shopping Cart</h1>
         <p className="mt-2 text-white/75">Review your selections before placing your order.</p>
       </div>

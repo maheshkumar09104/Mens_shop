@@ -41,7 +41,7 @@ function RegisterPage() {
     <section className="flex min-h-[calc(100vh-160px)] items-center justify-center py-10">
       <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 shadow-lg">
         <div className="text-center">
-          <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Join Mens Shop</p>
+          <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Join Focus Mens shop</p>
           <h1 className="mt-2 text-3xl font-black text-[#1a2e4a]">Create Account</h1>
           <p className="mt-3 text-sm text-slate-600">Register to save favorites and track your orders.</p>
         </div>

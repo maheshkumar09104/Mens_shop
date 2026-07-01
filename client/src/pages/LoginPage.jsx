@@ -33,7 +33,7 @@ function LoginPage() {
       }
 
       login(user, token);
-      toast.success("Welcome back to Mens Shop");
+      toast.success("Welcome back to Focus Mens shop");
       navigate("/products");
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed. Please try again.");
@@ -94,7 +94,7 @@ function LoginPage() {
         </form>
 
         <p className="mt-6 text-center text-sm text-slate-600">
-          New to Mens Shop?{" "}
+          New to Focus Mens shop?{" "}
           <Link to="/register" className="font-bold text-[#1a2e4a] underline decoration-[#c9a84c] underline-offset-4">
             Create an account
           </Link>

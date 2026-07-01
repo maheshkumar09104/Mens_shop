@@ -13,7 +13,7 @@ function OrderConfirmationPage() {
       <div className="rounded-lg border border-slate-200 bg-white p-5 text-center shadow-sm sm:p-8">
         <FaCheckCircle className="mx-auto text-5xl text-emerald-500" />
         <p className="mt-5 text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Order Confirmed</p>
-        <h1 className="mt-2 text-2xl font-black text-[#1a2e4a] sm:text-4xl">Thank you for shopping with Mens Shop</h1>
+        <h1 className="mt-2 text-2xl font-black text-[#1a2e4a] sm:text-4xl">Thank you for shopping with Focus Mens shop</h1>
         <p className="mt-3 text-slate-600">Order ID: {order?._id || "Pending"}</p>
       </div>
 

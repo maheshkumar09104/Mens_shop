@@ -45,7 +45,7 @@ function Navbar() {
             <span className="grid h-10 w-10 place-items-center rounded-md border border-amber-300 text-amber-300">
               <FaShoppingBag />
             </span>
-            Mens Shop
+            Focus Mens shop
           </Link>
 
           {!isMinimalPage && (

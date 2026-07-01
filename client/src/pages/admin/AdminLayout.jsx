@@ -24,7 +24,7 @@ function AdminLayout({ title, subtitle, children }) {
       <div className="grid min-h-[680px] lg:grid-cols-[260px_1fr]">
         <aside className="bg-[#1a2e4a] p-4 text-white sm:p-6">
           <div>
-            <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Mens Shop</p>
+            <p className="text-sm font-bold uppercase tracking-wide text-[#c9a84c]">Focus Mens shop</p>
             <h2 className="mt-2 text-2xl font-black">Admin</h2>
           </div>
 
